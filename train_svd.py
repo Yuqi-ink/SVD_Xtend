@@ -590,6 +590,7 @@ def main():
                 " use `--variant=non_ema` instead."
             ),
         )
+    
     logging_dir = os.path.join(args.output_dir, args.logging_dir)
     accelerator_project_config = ProjectConfiguration(
         project_dir=args.output_dir, logging_dir=logging_dir)

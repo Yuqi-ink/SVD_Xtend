@@ -1,0 +1,18 @@
+CUDA_VISIBLE_DEVICES=4,5,6,7 accelerate launch train_svd.py \
+    --pretrained_model_name_or_path /home/lyq/data/stable-video-diffusion-img2vid-xt \
+    --base_folder /home/lyq/code/datasets/DAVIS-2019-test-dev-480p/JPEGImages/480p \
+    --num_frames 14 \
+    --output_dir ./output \
+    --per_gpu_batch_size 1 \
+    --gradient_accumulation_steps 1 \
+    --num_train_epochs 100 \
+    --max_train_steps 5000 \
+    --width 512 \
+    --height 320 \
+    --checkpointing_steps 1000 \
+    --checkpoints_total_limit 1 \
+    --learning_rate 1e-5 \
+    --lr_warmup_steps 0 \
+    --seed 42 \
+    --mixed_precision "fp16" \
+    --validation_steps 200
