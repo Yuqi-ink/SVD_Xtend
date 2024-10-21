@@ -178,3 +178,5 @@ tags
 wandb
 outputs
 *.txt
+
+output/
