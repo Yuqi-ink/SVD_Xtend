@@ -542,7 +542,7 @@ class StableVideoDiffusionPipeline_Custom(DiffusionPipeline):
         )
         added_time_ids = added_time_ids.to(device)
 
-        # 4. Prepare timesteps
+        # 4. Prepare timestep
         self.scheduler.set_timesteps(num_inference_steps, device=device)
         timesteps = self.scheduler.timesteps
 
@@ -573,7 +573,7 @@ class StableVideoDiffusionPipeline_Custom(DiffusionPipeline):
         self._num_timesteps = len(timesteps)
 
         # image_condition_embedding = torch.cat(emb_cond['start_frame'], emb_cond['end_frame'], dim=1)
-        image_condition_embedding = emb_cond["end_frame"]
+        # image_condition_embedding = emb_cond["end_frame"]
 
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
@@ -585,13 +585,23 @@ class StableVideoDiffusionPipeline_Custom(DiffusionPipeline):
                 latent_model_input = torch.cat([latent_model_input, image_latents], dim=2)
 
                 # predict the noise residual
-                noise_pred = self.unet(
+                noise_pred_start = self.unet(
                     latent_model_input,
                     t,
-                    encoder_hidden_states=image_condition_embedding,
+                    encoder_hidden_states=emb_cond['start_frame'],
                     added_time_ids=added_time_ids,
                     return_dict=False,
                 )[0]
+
+                noise_pred_end = self.unet(
+                    latent_model_input,
+                    t,
+                    encoder_hidden_states=emb_cond['end_frame'],
+                    added_time_ids=added_time_ids,
+                    return_dict=False,
+                )[0]
+
+                noise_pred = (noise_pred_start + noise_pred_end) / 2
 
                 # perform guidance
                 if do_classifier_free_guidance:

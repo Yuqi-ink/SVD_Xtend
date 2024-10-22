@@ -1,8 +1,8 @@
-CUDA_VISIBLE_DEVICES=2 accelerate launch train_svd_my.py \
+CUDA_VISIBLE_DEVICES=0 accelerate launch train_svd_my.py \
     --pretrained_model_name_or_path /data/lyq/data/stable-video-diffusion-img2vid \
     --base_folder /data/lyq/datasets/DAVIS-2019-test-dev-480p/JPEGImages/480p \
-    --num_frames 25 \
-    --output_dir ./output/2019-test-dev-baseline-2cond \
+    --num_frames 16 \
+    --output_dir ./output/2019-test-dev/baseline-avg_pred_noise \
     --per_gpu_batch_size 1 \
     --gradient_accumulation_steps 1 \
     --num_train_epochs 100 \

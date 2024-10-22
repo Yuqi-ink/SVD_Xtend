@@ -181,3 +181,4 @@ outputs
 
 output/
 train.sh
+hup.sh

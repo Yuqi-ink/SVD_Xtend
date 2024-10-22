@@ -1008,6 +1008,10 @@ def main():
                     null_conditioning = torch.zeros_like(encoder_hidden_states)
                     encoder_hidden_states = torch.where(
                         prompt_mask, null_conditioning.unsqueeze(1), encoder_hidden_states.unsqueeze(1))
+                    encoder_hidden_states_end = torch.where(
+                        prompt_mask, null_conditioning.unsqueeze(1), encoder_hidden_states_end.unsqueeze(1))
+                    encoder_hidden_states_start = torch.where(
+                        prompt_mask, null_conditioning.unsqueeze(1), encoder_hidden_states_start.unsqueeze(1))
                     # Sample masks for the original images.
                     image_mask_dtype = conditional_latents.dtype
                     image_mask = 1 - (
@@ -1027,10 +1031,17 @@ def main():
                 inp_noisy_latents = torch.cat(
                     [inp_noisy_latents, conditional_latents], dim=2)
 
-                # check https://arxiv.org/abs/2206.00364(the EDM-framework) for more details.
+                # check https://arxiv.org/abs/2206.00364 (the EDM-framework) for more details.
                 target = latents
-                model_pred = unet(
-                    inp_noisy_latents, timesteps, encoder_hidden_states, added_time_ids=added_time_ids).sample
+                # model_pred = unet(
+                #     inp_noisy_latents, timesteps, encoder_hidden_states, added_time_ids=added_time_ids).sample
+                model_pred_start = unet(
+                    inp_noisy_latents, timesteps, encoder_hidden_states_start, added_time_ids=added_time_ids).sample
+
+                model_pred_end = unet(
+                    inp_noisy_latents, timesteps, encoder_hidden_states_end, added_time_ids=added_time_ids).sample
+
+                model_pred = (model_pred_start + model_pred_end) / 2
 
                 # Denoise the latents
                 c_out = -sigmas / ((sigmas**2 + 1)**0.5)
