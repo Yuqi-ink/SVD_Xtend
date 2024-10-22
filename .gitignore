@@ -180,3 +180,4 @@ outputs
 *.txt
 
 output/
+train.sh

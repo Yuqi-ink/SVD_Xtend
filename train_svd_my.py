@@ -946,7 +946,7 @@ def main():
                 )
                 conditional_pixel_values = pixel_values[:, 0:1, :, :, :] # torch.Size([1, 1, 3, 320, 512])
 
-                latents = tensor_to_vae_latent(pixel_values, vae)
+                latents = tensor_to_vae_latent(pixel_values, vae) # torch.Size([1, f, 4, 40, 64])
 
                 # Sample noise that we'll add to the latents
                 noise = torch.randn_like(latents)
@@ -958,7 +958,7 @@ def main():
                 conditional_pixel_values = \
                     torch.randn_like(conditional_pixel_values) * cond_sigmas + conditional_pixel_values
                 conditional_latents = tensor_to_vae_latent(conditional_pixel_values, vae)[:, 0, :, :, :]
-                conditional_latents = conditional_latents / vae.config.scaling_factor
+                conditional_latents = conditional_latents / vae.config.scaling_factor # torch.Size([1, 4, 40, 64])
 
                 # Sample a random timestep for each image
                 # P_mean=0.7 P_std=1.6
@@ -979,7 +979,7 @@ def main():
                 start_frame = pixel_values[:, 0, :, :, :].float()
                 end_frame = pixel_values[:, -1, :, :, :].float()
                 encoder_hidden_states_start = encode_image(start_frame)
-                encoder_hidden_states_end = encode_image(end_frame)
+                encoder_hidden_states_end = encode_image(end_frame) # torch.Size([1, 1024])
 
                 # encoder_hidden_states = torch.cat([encoder_hidden_states_start, encoder_hidden_states_end], dim=0)
                 encoder_hidden_states = encoder_hidden_states_end
@@ -997,12 +997,12 @@ def main():
                 added_time_ids = added_time_ids.to(latents.device)
 
                 # Conditioning dropout to support classifier-free guidance during inference. For more details
-                # check out the section 3.2.1 of the original paper https://arxiv.org/abs/2211.09800.
+                # check out the section 3.2.1 of the original paper https://arxiv.org/abs/2211.09800. (InstPix2Pix)
                 if args.conditioning_dropout_prob is not None:
                     random_p = torch.rand(
                         bsz, device=latents.device, generator=generator)
                     # Sample masks for the edit prompts.
-                    prompt_mask = random_p < 2 * args.conditioning_dropout_prob
+                    prompt_mask = random_p < 2 * args.conditioning_dropout_prob # 0.2
                     prompt_mask = prompt_mask.reshape(bsz, 1, 1)
                     # Final text conditioning.
                     null_conditioning = torch.zeros_like(encoder_hidden_states)
@@ -1020,8 +1020,10 @@ def main():
                     conditional_latents = image_mask * conditional_latents
 
                 # Concatenate the `conditional_latents` with the `noisy_latents`.
+                # noisy_latents: torch.Size([1, f, 4, 40, 64])
                 conditional_latents = conditional_latents.unsqueeze(
                     1).repeat(1, noisy_latents.shape[1], 1, 1, 1)
+                # inp_noisy_latents: torch.Size([1, f, 8, 40, 64])
                 inp_noisy_latents = torch.cat(
                     [inp_noisy_latents, conditional_latents], dim=2)
 

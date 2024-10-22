@@ -10,7 +10,7 @@ from diffusers.utils import BaseOutput, logging
 from diffusers.models.attention_processor import CROSS_ATTENTION_PROCESSORS, AttentionProcessor, AttnProcessor
 from diffusers.models.embeddings import TimestepEmbedding, Timesteps
 from diffusers.models.modeling_utils import ModelMixin
-from diffusers.models.unets.unet_3d_blocks import UNetMidBlockSpatioTemporal, get_down_block, get_up_block
+from diffusers.models.unet_3d_blocks import UNetMidBlockSpatioTemporal, get_down_block, get_up_block
 
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
@@ -57,8 +57,7 @@ class UNetSpatioTemporalConditionModel(ModelMixin, ConfigMixin, UNet2DConditionL
             The dimension of the cross attention features.
         transformer_layers_per_block (`int`, `Tuple[int]`, or `Tuple[Tuple]` , *optional*, defaults to 1):
             The number of transformer blocks of type [`~models.attention.BasicTransformerBlock`]. Only relevant for
-            [`~models.unets.unet_3d_blocks.CrossAttnDownBlockSpatioTemporal`],
-            [`~models.unets.unet_3d_blocks.CrossAttnUpBlockSpatioTemporal`],
+            [`~models.unets.unet_3d_blocks.CrossAttnDownBlockSpatioTemporal`], [`~models.unets.unet_3d_blocks.CrossAttnUpBlockSpatioTemporal`],
             [`~models.unets.unet_3d_blocks.UNetMidBlockSpatioTemporal`].
         num_attention_heads (`int`, `Tuple[int]`, defaults to `(5, 10, 10, 20)`):
             The number of attention heads.
